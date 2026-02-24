@@ -15,8 +15,10 @@ tar -xf SDelete.zip sdelete.exe
 Remove-Item SDelete.zip
 wget -O fs-encrypt.exe https://github.com/phil616/fs-encrypt/releases/latest/download/fs-encrypt-windows-amd64.exe
 ```
+注意：
 
-需要注意的是，wget命令下载的文件可能会被Windows的默认策略标记为`从网络下载的不受信任的文件`导致无法使用，需要先通过`icacls`处理权限后才能启动
+1. wget命令下载的文件可能会被Windows的默认策略标记为`从网络下载的不受信任的文件`导致无法使用，需要先通过`icacls`处理权限后才能启动
+2. 第一次启动`sdelete`需要同意终端用户请求声明
 
 ## 基础架构
 
