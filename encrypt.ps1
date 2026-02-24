@@ -1,16 +1,29 @@
-Write-Host "Encrypting sensitive folders..."
+Write-Host "Encrypting sensitive items..."
 
-$folders = Get-Content sensitive-folders.txt
+if (-not (Test-Path "sensitive-items.txt")) {
+    Write-Error "sensitive-items.txt not found!"
+    exit 1
+}
 
-foreach ($folder in $folders) {
-    if (Test-Path $folder) {
-        $encFile = "$folder.enc"
+$items = Get-Content sensitive-items.txt
 
-        Write-Host "Encrypting $folder → $encFile"
-
-        .\fs-encrypt.exe encrypt $folder $encFile
-
-        .\sdelete -p 7 -s -r ".\$folder"
+foreach ($item in $items) {
+    if (Test-Path $item) {
+        $encFile = "$item.enc"
+        
+        if (Test-Path -Path $item -PathType Container) {
+            # It's a directory
+            Write-Host "Encrypting folder $item → $encFile"
+            .\fs-encrypt.exe encrypt $item $encFile
+            .\sdelete -p 7 -s -r ".\$item"
+        } else {
+            # It's a file
+            Write-Host "Encrypting file $item → $encFile"
+            .\fs-encrypt.exe encrypt-item $item $encFile
+            .\sdelete -p 7 ".\$item"
+        }
+    } else {
+        Write-Warning "Item not found: $item"
     }
 }
 

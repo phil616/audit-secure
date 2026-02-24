@@ -1,18 +1,23 @@
-Write-Host "Checking for unencrypted sensitive folders..."
+Write-Host "Checking for unencrypted sensitive items..."
 
-$folders = Get-Content sensitive-folders.txt
+if (-not (Test-Path "sensitive-items.txt")) {
+    Write-Error "sensitive-items.txt not found!"
+    exit 1
+}
+
+$items = Get-Content sensitive-items.txt
 $staged = git diff --cached --name-only
 
-foreach ($folder in $folders) {
+foreach ($item in $items) {
 
-    # 1. 禁止明文目录存在
-    if (Test-Path $folder) {
-        Write-Host "Sensitive folder still exists: $folder" -ForegroundColor Red
+    # 1. 禁止明文文件/目录存在
+    if (Test-Path $item) {
+        Write-Host "Sensitive item still exists: $item" -ForegroundColor Red
         exit 1
     }
 
     # 2. 提交加密文件提示
-    $enc = "$folder.enc"
+    $enc = "$item.enc"
     if ($staged -notcontains $enc) {
         Write-Host "[Warning]Missing encrypted file in commit: $enc" -ForegroundColor Red
         # 如果强制提交则解除注释
